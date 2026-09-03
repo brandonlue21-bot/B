@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f4f5f7;
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  opacity: 1;
+}
