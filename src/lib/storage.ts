@@ -25,8 +25,25 @@ export async function getDataFilePath(): Promise<string | null> {
   return bridge ? bridge.getDataPath() : null;
 }
 
+/**
+ * Chrome refuses to show the file picker from a cross-origin iframe (e.g. this app
+ * embedded inside another site), throwing at call time. Detect that up front so we
+ * don't show a "Choose file" control that's guaranteed to silently fail.
+ */
+function isEmbeddedFrame(): boolean {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
 export function isFileSystemAccessSupported(): boolean {
-  return typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function';
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.showSaveFilePicker === 'function' &&
+    !isEmbeddedFrame()
+  );
 }
 
 export function isFilePromptDismissed(): boolean {

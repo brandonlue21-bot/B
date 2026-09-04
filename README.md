@@ -31,10 +31,24 @@ each student's final grade is calculated automatically.
 
 ## Running it as an installed app (recommended, no download)
 
-Open the app in Chrome or Edge, click **Install** in the address bar (or the
-browser menu → *Install Gradebook…* / *Apps → Install this site as an app*),
-and it opens in its own window with its own icon, separate from your other
-browser tabs.
+**This must be opened from its GitHub Pages URL, not a Claude Artifact link.**
+Both "Install" and the file-saving feature below require the page to be its
+own top-level site — Chrome disables both when a page is embedded inside
+another site's frame, which is what a Claude Artifact preview is.
+
+One-time setup (a repo admin does this once): in this repo's GitHub settings,
+go to **Settings → Pages → Build and deployment → Source**, and select
+**"GitHub Actions"**. The included workflow
+(`.github/workflows/deploy-pages.yml`) then builds and deploys the app on
+every push to `claude/weighted-grade-marking-3u58kx`, publishing it at
+`https://<your-github-username>.github.io/<repo-name>/`. Find the exact URL
+under Settings → Pages once the first deployment finishes (check the
+"Actions" tab for progress), or under repo → Environments → github-pages.
+
+From that URL, in Chrome or Edge: click **Install** in the address bar (or
+the browser menu → *Install Gradebook…* / *Apps → Install this site as an
+app*), and it opens in its own window with its own icon, separate from your
+other browser tabs.
 
 The first time, an amber banner offers **"Choose file…"** — pick or create a
 `.json` file anywhere on your computer (e.g. in Documents), and grades save

@@ -84,8 +84,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const chooseFile = useCallback(async () => {
-    const result = await chooseNewFile(data);
-    if (result) setMode(result.mode);
+    try {
+      const result = await chooseNewFile(data);
+      if (result) setMode(result.mode);
+    } catch (err) {
+      alert(
+        `Couldn't open the file picker: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }, [data]);
 
   const doReconnectFile = useCallback(async () => {
