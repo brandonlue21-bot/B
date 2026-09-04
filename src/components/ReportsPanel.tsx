@@ -1,6 +1,7 @@
 import { Fragment, useRef, useState } from 'react';
 import { useStore } from '../store';
 import { computeClassResults, formatPercent, toLetterGrade } from '../lib/grades';
+import { downloadFile } from '../lib/download';
 import type { AppData } from '../types';
 
 export function ReportsPanel() {
@@ -165,14 +166,4 @@ export function ReportsPanel() {
       </div>
     </div>
   );
-}
-
-function downloadFile(content: string, filename: string, mime: string) {
-  const blob = new Blob([content], { type: mime });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }
