@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from './store';
 import { getDataFilePath, isDesktopApp } from './lib/storage';
 import { ClassSwitcher } from './components/ClassSwitcher';
+import { StorageBanner, ReconnectScreen } from './components/StorageBanner';
 import { StudentsPanel } from './components/StudentsPanel';
 import { CategoriesPanel } from './components/CategoriesPanel';
 import { AssignmentsPanel } from './components/AssignmentsPanel';
@@ -19,7 +20,7 @@ const TABS = [
 type TabKey = (typeof TABS)[number]['key'];
 
 function App() {
-  const { currentClass } = useStore();
+  const { currentClass, storageMode, chooseFile, isFileSystemAccessSupported } = useStore();
   const [tab, setTab] = useState<TabKey>('gradebook');
   const [dataPath, setDataPath] = useState<string | null>(null);
 
@@ -27,12 +28,38 @@ function App() {
     if (isDesktopApp()) getDataFilePath().then(setDataPath);
   }, []);
 
+  const footerText =
+    storageMode.kind === 'desktop' && dataPath
+      ? `Grades are saved automatically to ${dataPath}. Use "Export backup" on the Reports tab to save a copy elsewhere.`
+      : storageMode.kind === 'file'
+        ? `Grades are saved automatically to ${storageMode.fileName}. Use "Export backup" on the Reports tab to save a copy elsewhere.`
+        : 'Grades are saved automatically in this browser. Use "Export backup" on the Reports tab to save a copy.';
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <h1 className="text-xl font-bold text-slate-800">📊 Gradebook</h1>
-          <ClassSwitcher />
+          <div className="flex items-center gap-3">
+            {storageMode.kind === 'file' && (
+              <button
+                onClick={() => void chooseFile()}
+                className="text-sm text-slate-500 hover:text-slate-700"
+                title="Choose a different save file"
+              >
+                📄 {storageMode.fileName}
+              </button>
+            )}
+            {storageMode.kind === 'browser' && isFileSystemAccessSupported && (
+              <button
+                onClick={() => void chooseFile()}
+                className="text-sm text-slate-500 underline hover:text-slate-700"
+              >
+                Save to a file…
+              </button>
+            )}
+            <ClassSwitcher />
+          </div>
         </div>
         <nav className="mx-auto flex max-w-6xl gap-1 px-4">
           {TABS.map((t) => (
@@ -51,8 +78,12 @@ function App() {
         </nav>
       </header>
 
+      <StorageBanner />
+
       <main className="mx-auto max-w-6xl px-4 py-6">
-        {!currentClass ? (
+        {storageMode.kind === 'file-needs-permission' ? (
+          <ReconnectScreen />
+        ) : !currentClass ? (
           <p className="text-center text-slate-500">Loading…</p>
         ) : (
           <>
@@ -66,9 +97,7 @@ function App() {
       </main>
 
       <footer className="mx-auto max-w-6xl px-4 pb-6 text-center text-xs text-slate-400">
-        {dataPath
-          ? `Grades are saved automatically to ${dataPath}. Use "Export backup" on the Reports tab to save a copy elsewhere.`
-          : 'Grades are saved automatically in this browser. Use "Export backup" on the Reports tab to save a copy.'}
+        {footerText}
       </footer>
     </div>
   );

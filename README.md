@@ -22,11 +22,31 @@ each student's final grade is calculated automatically.
 - **Reports** — a sortable summary of final grades and letter grades (Ontario
   scale), with a per-student breakdown by category, CSV export for report
   cards, and JSON export/import for backups.
-- **Autosaves** — as a desktop app, to a JSON file in your user data folder;
-  as a web page, to the browser's local storage. No account or server
-  needed either way.
+- **Autosaves** to a real file on your computer that you pick (Chrome/Edge,
+  via the File System Access API), a file in your user data folder as a
+  desktop app, or the browser's local storage as a fallback. No account or
+  server needed in any case.
+- **Installable** as a standalone app window from Chrome/Edge (no download) —
+  the page ships a web app manifest and icons.
 
-## Desktop app (Windows)
+## Running it as an installed app (recommended, no download)
+
+Open the app in Chrome or Edge, click **Install** in the address bar (or the
+browser menu → *Install Gradebook…* / *Apps → Install this site as an app*),
+and it opens in its own window with its own icon, separate from your other
+browser tabs.
+
+The first time, an amber banner offers **"Choose file…"** — pick or create a
+`.json` file anywhere on your computer (e.g. in Documents), and grades save
+to it automatically from then on, no more clicking save. The browser may
+occasionally ask you to reconfirm access to that file (a one-click "Reconnect"
+prompt) — that's normal File System Access API behavior, not a bug. You can
+skip this and keep using in-browser storage instead ("Not now"), and opt in
+later from the "Save to a file…" link in the header. This only works in
+Chromium-based browsers (Chrome, Edge); Firefox and Safari fall back to
+browser storage automatically.
+
+## Desktop app (Windows, alternative)
 
 This app can run as a standalone Windows program via Electron, saving grades
 to a file on your computer instead of the browser.

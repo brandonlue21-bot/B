@@ -1,11 +1,31 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { AppData, Assignment, Category, ClassData } from './types';
-import { emptyClass, loadData, makeId, saveData } from './lib/storage';
+import {
+  chooseNewFile,
+  dismissFilePrompt,
+  emptyClass,
+  forgetFile,
+  initStorage,
+  isFilePromptDismissed,
+  isFileSystemAccessSupported,
+  loadFromBrowserStorage,
+  makeId,
+  reconnectFile,
+  saveData as persist,
+  type StorageMode,
+} from './lib/storage';
 
 interface Store {
   data: AppData;
   currentClass: ClassData | undefined;
+  storageMode: StorageMode;
+  filePromptDismissed: boolean;
+  isFileSystemAccessSupported: boolean;
+  chooseFile: () => Promise<void>;
+  reconnectFile: () => Promise<void>;
+  dismissFilePrompt: () => void;
+  useBrowserStorageInstead: () => void;
   setCurrentClassId: (id: string) => void;
   addClass: (name: string) => void;
   renameClass: (id: string, name: string) => void;
@@ -33,13 +53,20 @@ const EMPTY_DATA: AppData = { classes: [], currentClassId: null };
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppData>(EMPTY_DATA);
+  const [mode, setMode] = useState<StorageMode>({ kind: 'browser' });
   const [ready, setReady] = useState(false);
+  const [filePromptDismissed, setFilePromptDismissed] = useState(isFilePromptDismissed());
+  const modeRef = useRef(mode);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   useEffect(() => {
     let cancelled = false;
-    loadData().then((loaded) => {
+    initStorage().then((result) => {
       if (cancelled) return;
-      setData(loaded);
+      setMode(result.mode);
+      if (result.data) setData(result.data);
       setReady(true);
     });
     return () => {
@@ -48,13 +75,36 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (ready) saveData(data);
-  }, [data, ready]);
+    if (ready && mode.kind !== 'file-needs-permission') persist(mode, data);
+  }, [data, mode, ready]);
 
   const currentClass = useMemo(
     () => data.classes.find((c) => c.id === data.currentClassId) ?? data.classes[0],
     [data],
   );
+
+  const chooseFile = useCallback(async () => {
+    const result = await chooseNewFile(data);
+    if (result) setMode(result.mode);
+  }, [data]);
+
+  const doReconnectFile = useCallback(async () => {
+    if (modeRef.current.kind !== 'file-needs-permission') return;
+    const result = await reconnectFile(modeRef.current.handle);
+    setMode(result.mode);
+    if (result.data) setData(result.data);
+  }, []);
+
+  const doDismissFilePrompt = useCallback(() => {
+    dismissFilePrompt();
+    setFilePromptDismissed(true);
+  }, []);
+
+  const useBrowserStorageInstead = useCallback(() => {
+    forgetFile();
+    setMode({ kind: 'browser' });
+    setData((d) => (d.classes.length > 0 ? d : loadFromBrowserStorage()));
+  }, []);
 
   const setCurrentClassId = useCallback((id: string) => {
     setData((d) => ({ ...d, currentClassId: id }));
@@ -248,6 +298,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const store: Store = {
     data,
     currentClass,
+    storageMode: mode,
+    filePromptDismissed,
+    isFileSystemAccessSupported: isFileSystemAccessSupported(),
+    chooseFile,
+    reconnectFile: doReconnectFile,
+    dismissFilePrompt: doDismissFilePrompt,
+    useBrowserStorageInstead,
     setCurrentClassId,
     addClass,
     renameClass,
