@@ -7,6 +7,8 @@ export function StudentsPanel() {
   const [bulk, setBulk] = useState('');
   const [showBulk, setShowBulk] = useState(false);
 
+  if (!currentClass) return null;
+
   const sorted = [...currentClass.students].sort((a, b) => a.name.localeCompare(b.name));
 
   return (

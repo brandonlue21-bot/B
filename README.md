@@ -22,14 +22,37 @@ each student's final grade is calculated automatically.
 - **Reports** — a sortable summary of final grades and letter grades (Ontario
   scale), with a per-student breakdown by category, CSV export for report
   cards, and JSON export/import for backups.
-- **Autosaves** to the browser's local storage — no account or server
-  needed.
+- **Autosaves** — as a desktop app, to a JSON file in your user data folder;
+  as a web page, to the browser's local storage. No account or server
+  needed either way.
+
+## Desktop app (Windows)
+
+This app can run as a standalone Windows program via Electron, saving grades
+to a file on your computer instead of the browser.
+
+```bash
+npm install
+npm run electron:build   # builds dist/ then packages release/Gradebook-<version>-win.zip
+```
+
+Unzip `release/Gradebook-<version>-win.zip` anywhere and run `Gradebook.exe`.
+Since the app isn't code-signed, Windows SmartScreen will show an "unknown
+publisher" warning the first time — click **More info → Run anyway**.
+
+Grades are saved automatically to `gradebook-data.json` in your Windows user
+data folder (shown in the app's footer) as you type — no manual save needed.
+Use **Export backup** on the Reports tab any time you want a separate copy
+(e.g. to move to another computer or attach to an email).
+
+To try the desktop app without building an installer, run
+`npm run electron:dev` in one terminal alongside `npm run dev` in another.
 
 ## Development
 
 ```bash
 npm install
-npm run dev      # start the dev server
+npm run dev      # start the dev server (web version)
 npm run build    # type-check and build for production
 npm run lint      # run oxlint
 ```

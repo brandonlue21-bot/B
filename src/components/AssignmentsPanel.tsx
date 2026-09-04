@@ -4,6 +4,8 @@ import { useStore } from '../store';
 export function AssignmentsPanel() {
   const { currentClass, addAssignment, updateAssignment, deleteAssignment } = useStore();
 
+  if (!currentClass) return null;
+
   if (currentClass.categories.length === 0) {
     return (
       <div className="mx-auto max-w-2xl rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">

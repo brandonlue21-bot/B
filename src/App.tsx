@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from './store';
+import { getDataFilePath, isDesktopApp } from './lib/storage';
 import { ClassSwitcher } from './components/ClassSwitcher';
 import { StudentsPanel } from './components/StudentsPanel';
 import { CategoriesPanel } from './components/CategoriesPanel';
@@ -20,6 +21,11 @@ type TabKey = (typeof TABS)[number]['key'];
 function App() {
   const { currentClass } = useStore();
   const [tab, setTab] = useState<TabKey>('gradebook');
+  const [dataPath, setDataPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isDesktopApp()) getDataFilePath().then(setDataPath);
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -60,8 +66,9 @@ function App() {
       </main>
 
       <footer className="mx-auto max-w-6xl px-4 pb-6 text-center text-xs text-slate-400">
-        Grades are saved automatically in this browser. Use "Export backup" on the Reports tab to
-        save a copy.
+        {dataPath
+          ? `Grades are saved automatically to ${dataPath}. Use "Export backup" on the Reports tab to save a copy elsewhere.`
+          : 'Grades are saved automatically in this browser. Use "Export backup" on the Reports tab to save a copy.'}
       </footer>
     </div>
   );

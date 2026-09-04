@@ -5,7 +5,7 @@ import { emptyClass, loadData, makeId, saveData } from './lib/storage';
 
 interface Store {
   data: AppData;
-  currentClass: ClassData;
+  currentClass: ClassData | undefined;
   setCurrentClassId: (id: string) => void;
   addClass: (name: string) => void;
   renameClass: (id: string, name: string) => void;
@@ -29,12 +29,27 @@ function updateClass(data: AppData, classId: string, fn: (c: ClassData) => Class
   return { ...data, classes: data.classes.map((c) => (c.id === classId ? fn(c) : c)) };
 }
 
+const EMPTY_DATA: AppData = { classes: [], currentClassId: null };
+
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<AppData>(() => loadData());
+  const [data, setData] = useState<AppData>(EMPTY_DATA);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    saveData(data);
-  }, [data]);
+    let cancelled = false;
+    loadData().then((loaded) => {
+      if (cancelled) return;
+      setData(loaded);
+      setReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (ready) saveData(data);
+  }, [data, ready]);
 
   const currentClass = useMemo(
     () => data.classes.find((c) => c.id === data.currentClassId) ?? data.classes[0],

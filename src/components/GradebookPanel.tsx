@@ -3,6 +3,9 @@ import { computeStudentResult, formatPercent } from '../lib/grades';
 
 export function GradebookPanel() {
   const { currentClass, setScore } = useStore();
+
+  if (!currentClass) return null;
+
   const { students, categories, assignments, scores } = currentClass;
 
   if (students.length === 0 || assignments.length === 0) {

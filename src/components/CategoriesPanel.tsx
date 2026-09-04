@@ -7,6 +7,8 @@ export function CategoriesPanel() {
   const [name, setName] = useState('');
   const [weight, setWeight] = useState('');
 
+  if (!currentClass) return null;
+
   const total = categoryWeightTotal(currentClass.categories);
   const totalOk = Math.abs(total - 100) < 0.01;
 

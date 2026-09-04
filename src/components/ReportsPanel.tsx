@@ -9,12 +9,15 @@ export function ReportsPanel() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
-  const results = computeClassResults(currentClass).sort((a, b) =>
+  if (!currentClass) return null;
+  const cls = currentClass;
+
+  const results = computeClassResults(cls).sort((a, b) =>
     a.student.name.localeCompare(b.student.name),
   );
 
   function exportCsv() {
-    const header = ['Student', ...currentClass.categories.map((c) => `${c.name} (%)`), 'Final (%)', 'Letter'];
+    const header = ['Student', ...cls.categories.map((c) => `${c.name} (%)`), 'Final (%)', 'Letter'];
     const rows = results.map((r) => [
       r.student.name,
       ...r.categories.map((c) => (c.percent === null ? '' : c.percent.toFixed(1))),
@@ -24,7 +27,7 @@ export function ReportsPanel() {
     const csv = [header, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
       .join('\n');
-    downloadFile(csv, `${currentClass.name.replace(/\s+/g, '_')}_grades.csv`, 'text/csv');
+    downloadFile(csv, `${cls.name.replace(/\s+/g, '_')}_grades.csv`, 'text/csv');
   }
 
   function exportJson() {
