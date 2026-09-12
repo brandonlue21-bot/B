@@ -12,7 +12,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "electron:dev": "GRADEBOOK_DEV_SERVER_URL=http://localhost:5173 electron .",
-    "electron:build": "npm run build && electron-builder --win zip"
+    "electron:build": "npm run build && electron-builder --win zip",
+    "build:standalone": "npm run build && node scripts/build-standalone.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

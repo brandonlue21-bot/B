@@ -60,6 +60,31 @@ later from the "Save to a file…" link in the header. This only works in
 Chromium-based browsers (Chrome, Edge); Firefox and Safari fall back to
 browser storage automatically.
 
+## Single local file (works fully offline, no install, no server)
+
+For a machine that can't install anything and might not always have internet
+(e.g. a locked-down work laptop): build one self-contained HTML file and
+just double-click it to open, same as opening a saved Word document.
+
+```bash
+npm install
+npm run build:standalone   # writes dist-standalone/Gradebook.html
+```
+
+Copy `Gradebook.html` anywhere (Desktop, a USB drive, wherever) and open it
+in Chrome or Edge — everything (the app code, styling, icons) is bundled
+into that one file, so it needs no internet connection and no other files
+alongside it. Grades still autosave, either to browser storage or to a file
+you pick via **"Choose file…"**, exactly as described above — this file just
+skips needing a server or the internet to load the app itself. "Install as
+an app" doesn't apply here (that specifically requires an https:// address),
+but everything else works the same.
+
+Note this file has its own separate storage from the GitHub Pages version —
+opening `Gradebook.html` won't show grades you entered at the Pages URL, or
+vice versa. Use **Export backup** / **Import class** on the Reports tab to
+move data between them, same as moving data between two different computers.
+
 ## Desktop app (Windows, alternative)
 
 This app can run as a standalone Windows program via Electron, saving grades
