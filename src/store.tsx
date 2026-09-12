@@ -41,6 +41,7 @@ interface Store {
   deleteAssignment: (id: string) => void;
   setScore: (studentId: string, assignmentId: string, value: number | undefined) => void;
   replaceCurrentClass: (next: ClassData) => void;
+  replaceAllData: (next: AppData) => void;
 }
 
 const StoreContext = createContext<Store | null>(null);
@@ -301,6 +302,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [currentId],
   );
 
+  const replaceAllData = useCallback((next: AppData) => {
+    if (!next.classes || next.classes.length === 0) return;
+    const currentClassId = next.classes.some((c) => c.id === next.currentClassId)
+      ? next.currentClassId
+      : next.classes[0].id;
+    setData({ ...next, currentClassId });
+  }, []);
+
   const store: Store = {
     data,
     currentClass,
@@ -326,6 +335,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     deleteAssignment,
     setScore,
     replaceCurrentClass,
+    replaceAllData,
   };
 
   return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;

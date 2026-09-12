@@ -5,7 +5,7 @@ import { downloadFile } from '../lib/download';
 import type { AppData } from '../types';
 
 export function ReportsPanel() {
-  const { data, currentClass, replaceCurrentClass } = useStore();
+  const { data, currentClass, replaceCurrentClass, replaceAllData } = useStore();
   const [expanded, setExpanded] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
@@ -43,12 +43,18 @@ export function ReportsPanel() {
     reader.onload = () => {
       try {
         const parsed = JSON.parse(String(reader.result));
-        if (parsed && parsed.students && parsed.categories && parsed.assignments) {
-          if (confirm('Replace the current class data with this file?')) {
+        if (parsed && Array.isArray(parsed.classes) && parsed.classes.length > 0) {
+          // A full backup (Export backup, or the auto-saved file) — every class it contains.
+          if (confirm(`Replace ALL classes with the ${parsed.classes.length} in this backup?`)) {
+            replaceAllData(parsed);
+          }
+        } else if (parsed && parsed.students && parsed.categories && parsed.assignments) {
+          // A single class's data (older exports, or one class copied out of a backup by hand).
+          if (confirm(`Replace "${cls.name}" with this file's data?`)) {
             replaceCurrentClass(parsed);
           }
         } else {
-          alert('That file does not look like a class backup.');
+          alert('That file does not look like a Gradebook backup.');
         }
       } catch {
         alert('Could not read that file.');
@@ -81,7 +87,7 @@ export function ReportsPanel() {
             onClick={() => fileInput.current?.click()}
             className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
-            Import class
+            Import backup
           </button>
           <input
             ref={fileInput}

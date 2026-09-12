@@ -82,7 +82,7 @@ but everything else works the same.
 
 Note this file has its own separate storage from the GitHub Pages version —
 opening `Gradebook.html` won't show grades you entered at the Pages URL, or
-vice versa. Use **Export backup** / **Import class** on the Reports tab to
+vice versa. Use **Export backup** / **Import backup** on the Reports tab to
 move data between them, same as moving data between two different computers.
 
 ## Desktop app (Windows, alternative)
